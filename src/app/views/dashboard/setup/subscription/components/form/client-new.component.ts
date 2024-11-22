@@ -14,25 +14,18 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import {MatSelectModule} from "@angular/material/select";
-import {CategoryService} from "../../../../../../providers/services/setup/category.service";
-import {CommonModule} from "@angular/common";
-import {MatOptionModule} from "@angular/material/core";
 
 @Component({
     selector: 'app-clients-new',
     standalone: true,
     imports: [
-        CommonModule,
         FormsModule,
         MatIconModule,
         MatButtonModule,
         ReactiveFormsModule,
         MatSlideToggleModule,
         MatFormFieldModule,
-        MatOptionModule,
         MatInputModule,
-        MatSelectModule,
     ],
     template: `
         <div class="flex flex-col max-w-240 md:min-w-160 max-h-screen -m-6">
@@ -52,23 +45,23 @@ import {MatOptionModule} from "@angular/material/core";
             <form class="flex flex-col flex-auto p-6 sm:p-8 overflow-y-auto" [formGroup]="clientForm">
                 <mat-form-field>
                     <mat-label>Nombre</mat-label>
-                    <input matInput formControlName="name" />
+                    <input matInput formControlName="nombre" />
                 </mat-form-field>
                 <mat-form-field>
-                    <mat-label>Descripción</mat-label>
-                    <input matInput formControlName="description" />
+                    <mat-label>Apellidos</mat-label>
+                    <input matInput formControlName="apellidos" />
                 </mat-form-field>
                 <mat-form-field>
-                    <mat-label>Precio</mat-label>
-                    <input matInput formControlName="price" type="number"/>
+                    <mat-label>DNI</mat-label>
+                    <input matInput formControlName="dni" />
                 </mat-form-field>
                 <mat-form-field>
-                    <mat-label>Categoría</mat-label>
-                    <mat-select formControlName="category">
-                        <mat-option *ngFor="let category of categories" [value]="category.id">
-                            {{ category.name }}
-                        </mat-option>
-                    </mat-select>
+                    <mat-label>Telefono</mat-label>
+                    <input matInput formControlName="telefono" />
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Correo</mat-label>
+                    <input matInput formControlName="correo" />
                 </mat-form-field>
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mt-4 sm:mt-6">
@@ -83,49 +76,27 @@ import {MatOptionModule} from "@angular/material/core";
         </div>
     `,
 })
-export class ServiceNewComponent implements OnInit {
+export class ClientNewComponent implements OnInit {
     @Input() title: string = '';
-    @Input() categories: any[] = [];
     abcForms: any;
     clientForm = new FormGroup({
 
-        name: new FormControl('', [Validators.required]),
-        description: new FormControl('', [Validators.required]),
-        price: new FormControl('', [Validators.required]),
-        category: new FormControl(null, [Validators.required]),
+        nombre: new FormControl('', [Validators.required]),
+        apellidos: new FormControl('', [Validators.required]),
+        dni: new FormControl('', [Validators.required]),
+        telefono: new FormControl('', [Validators.required]),
+        correo: new FormControl('', [Validators.required]),
     });
 
-    constructor(
-        private categoryService: CategoryService,
-        private _matDialog: MatDialogRef<ServiceNewComponent>
-    ) {}
+    constructor(private _matDialog: MatDialogRef<ClientNewComponent>) {}
 
     ngOnInit() {
         this.abcForms = abcForms;
-        this.loadCategories();
-    }
-
-    private loadCategories(): void {
-        this.categoryService.getCategories().subscribe(
-            (data) => {
-                this.categories = data;
-            },
-            (error) => {
-                console.error('Error al cargar categorías:', error);
-            }
-        );
     }
 
     public saveForm(): void {
         if (this.clientForm.valid) {
-            const formData = this.clientForm.value;
-            formData.category = {
-                id: formData.category,
-                name: null,
-                description: null
-            }
-            console.log('Datos enviados al backend:', formData);
-            this._matDialog.close(formData);
+            this._matDialog.close(this.clientForm.value);
         }
     }
 

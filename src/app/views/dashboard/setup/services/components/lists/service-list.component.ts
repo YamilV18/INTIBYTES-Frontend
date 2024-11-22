@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 
 import { abcForms } from '../../../../../../../environments/generals';
 import { Service } from '../../models/service';
@@ -7,10 +7,12 @@ import { RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
+import {CategoryService} from "../../../../../../providers/services/setup/category.service";
+import {FormsModule} from "@angular/forms";
 
 @Component({
     selector: 'app-service-list',
-    imports: [CommonModule, RouterOutlet, MatButtonModule, MatIconModule],
+    imports: [CommonModule, RouterOutlet, MatButtonModule, MatIconModule, FormsModule],
     standalone: true,
     template: `
         <div class="w-full mx-auto p-6 bg-white rounded overflow-hidden shadow-lg">
@@ -23,6 +25,56 @@ import { MatDialog } from '@angular/material/dialog';
                     <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
                     <span class="ml-2">Nuevo Servicio</span>
                 </button>
+            </div>
+            <!-- Filtros -->
+            <div class="bg-gray-100 rounded p-2 mb-2">
+                <div class="sm:flex sm:space-x-4">
+                    <!-- Filtro de NOMBRE -->
+                    <div class="flex-1">
+                        <div class="px-4 sm:px-6 py-2">
+                            <div class="font-semibold text-lg mb-2">
+                                Filtro de Nombre
+                            </div>
+                            <div class="mb-2">
+                                <input
+                                    class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                                    id="name"
+                                    type="text"
+                                    [(ngModel)]="filterName"
+                                    (input)="applyFilters()"
+                                    placeholder="Ingrese el nombre"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro de CATEGORÍA -->
+                    <div class="flex-1">
+                        <div class="px-4 sm:px-6 py-2">
+                            <div class="font-semibold text-lg mb-1">
+                                Filtro de Categoría
+                            </div>
+                            <div class="mb-2">
+                                <select
+                                    class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                                    id="category"
+                                    [(ngModel)]="filterCategory"
+                                    (change)="applyFilters()"
+                                >
+                                    <option value="">
+                                        Seleccionar
+                                    </option>
+                                    <option
+                                        *ngFor="let category of categories"
+                                        [value]="category.id"
+                                    >
+                                        {{ category.name }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="bg-white rounded overflow-hidden shadow-lg">
                 <div class="p-2 overflow-scroll px-0">
@@ -49,10 +101,10 @@ import { MatDialog } from '@angular/material/dialog';
                         </thead>
                         <tbody
                             class="bg-white"
-                            *ngFor="let r of service; let i = index">
+                            *ngFor="let r of filteredServices.slice(pageStart - 1, pageEnd); let i = index">
                             <tr class="hover:bg-gray-100">
                                 <td class="w-1/6 p-2 text-center border-b">
-                                    {{ i }}
+                                    {{ i + pageStart }}
                                 </td>
                                 <td class="w-2/6 p-2  text-start border-b text-sm">
                                     {{ r.name }}
@@ -84,39 +136,109 @@ import { MatDialog } from '@angular/material/dialog';
                             </tr>
                         </tbody>
                     </table>
-                    <!--<div class="px-5 py-2 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
+                    <!-- paginación -->
+                    <div
+                        class="px-5 py-2 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between"
+                    >
                         <span class="text-xs xs:text-sm text-gray-900">
-                            Showing 1 to 4 of 50 Entries
+                            Mostrando {{ pageStart }} a {{ pageEnd }} de {{ service.length }} Entradas
                         </span>
                         <div class="inline-flex mt-2 xs:mt-0">
-                            <button class="text-sm text-primary-50 transition duration-150 hover:bg-primary-500 bg-primary-600 font-semibold py-2 px-4 rounded-l">
+                            <button
+                                class="text-sm text-primary-50 transition duration-150 hover:bg-primary-500 bg-primary-600 font-semibold py-2 px-4 rounded-l"
+                                (click)="goToPage(page - 1)"
+                                [disabled]="page === 1"
+                            >
                                 Prev
                             </button>
                             &nbsp; &nbsp;
-                            <button class="text-sm text-primary-50 transition duration-150 hover:bg-primary-500 bg-primary-600 font-semibold py-2 px-4 rounded-r">
+                            <button
+                                class="text-sm text-primary-50 transition duration-150 hover:bg-primary-500 bg-primary-600 font-semibold py-2 px-4 rounded-r"
+                                (click)="goToPage(page + 1)"
+                                [disabled]="page === totalPages"
+                            >
                                 Next
                             </button>
                         </div>
-                    </div>-->
+                    </div>
                 </div>
             </div>
         </div>
     `,
 })
-export class ServiceListComponent implements OnInit {
+export class ServiceListComponent implements OnInit, OnChanges {
     abcForms: any;
     @Input() service: Service[] = [];
+    @Input() categories: any[] = [];
     @Output() eventNew = new EventEmitter<boolean>();
     @Output() eventEdit = new EventEmitter<number>();
     @Output() eventDelete = new EventEmitter<number>();
     @Output() eventAssign = new EventEmitter<number>();
 
-    constructor(private _matDialog: MatDialog) {}
+    //filtro
+    filterName: string = '';
+    filterCategory: string = '';
+    filteredServices: Service[] = [];
+
+    //paginación
+    page: number = 1; // Página actual
+    pageSize: number = 10; // Cantidad de servicios por página
+    totalPages: number = 1; // Total de páginas
+    pageStart: number = 1; // Primer servicio en la página
+    pageEnd: number = 10; // Último servicio en la página
+
+    constructor(private _matDialog: MatDialog, private categoryService: CategoryService) {}
 
     ngOnInit() {
         this.abcForms = abcForms;
+        this.loadCategories();
+        this.calculateTotalPages();
+    }
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['service'] && changes['service'].currentValue) {
+            this.filteredServices = [...this.service];
+            this.calculateTotalPages();
+            this.updatePageData();
+        }
+    }
+    private loadCategories(): void {
+        this.categoryService.getCategories().subscribe(
+            (data) => {
+                this.categories = data;
+            },
+            (error) => {
+                console.error('Error al cargar categorías:', error);
+            }
+        );
+    }
+    // Función que actualiza el filtro
+    public applyFilters(): void {
+        this.filteredServices = this.service.filter((service) => {
+            const matchesName = service.name.toLowerCase().includes(this.filterName.toLowerCase());
+            const matchesCategory = this.filterCategory ? service.category.id === +this.filterCategory : true;
+            return matchesName && matchesCategory;
+        });
     }
 
+    private calculateTotalPages(): void {
+        this.totalPages = Math.ceil(this.filteredServices.length / this.pageSize);
+    }
+
+    // Actualizar los servicios mostrados según la página actual
+    private updatePageData(): void {
+        const startIndex = (this.page - 1) * this.pageSize;
+        const endIndex = startIndex + this.pageSize;
+        this.pageStart = startIndex + 1;
+        this.pageEnd = endIndex < this.filteredServices.length ? endIndex : this.filteredServices.length;
+    }
+
+    // Cambiar de página
+    public goToPage(pageNumber: number): void {
+        if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+            this.page = pageNumber;
+            this.updatePageData();
+        }
+    }
     public goNew(): void {
         this.eventNew.emit(true);
     }
