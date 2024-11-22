@@ -14,6 +14,8 @@ export const END_POINTS = {
       client: 'cliente',
       service: 'service',
       category: 'category',
+      billing: 'billing',
+      subscription: 'subscription',
     accesRole: 'acceso-rol',
     person: 'persona',
     institution: 'institucion',

@@ -1,0 +1,7 @@
+# pack-refs with: peeled fully-peeled sorted 
+8543edec42ebf3c2129f3fe65eb34d4210e65d74 refs/heads/david
+b94827ba47a3547c1d32977bc440bdf5a6b3740a refs/heads/henyel
+3fcbcf14a033d5b04d83135f997128752ccaebb1 refs/heads/main
+c09f45827d085121e36cb6406f3d57d7e173890d refs/heads/nick
+3fcbcf14a033d5b04d83135f997128752ccaebb1 refs/heads/test
+973c702881be87bf232fab7e70277996c7f1fa05 refs/heads/yamil
