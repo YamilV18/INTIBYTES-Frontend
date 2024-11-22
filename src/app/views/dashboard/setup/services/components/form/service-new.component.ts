@@ -14,18 +14,25 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import {MatSelectModule} from "@angular/material/select";
+import {CategoryService} from "../../../../../../providers/services/setup/category.service";
+import {CommonModule} from "@angular/common";
+import {MatOptionModule} from "@angular/material/core";
 
 @Component({
     selector: 'app-clients-new',
     standalone: true,
     imports: [
+        CommonModule,
         FormsModule,
         MatIconModule,
         MatButtonModule,
         ReactiveFormsModule,
         MatSlideToggleModule,
         MatFormFieldModule,
+        MatOptionModule,
         MatInputModule,
+        MatSelectModule,
     ],
     template: `
         <div class="flex flex-col max-w-240 md:min-w-160 max-h-screen -m-6">
@@ -56,8 +63,12 @@ import { MatInputModule } from '@angular/material/input';
                     <input matInput formControlName="price" />
                 </mat-form-field>
                 <mat-form-field>
-                    <mat-label>ID_Categoría</mat-label>
-                    <input matInput formControlName="category" />
+                    <mat-label>Categoría</mat-label>
+                    <mat-select formControlName="category">
+                        <mat-option *ngFor="let category of categories" [value]="category.id">
+                            {{ category.name }}
+                        </mat-option>
+                    </mat-select>
                 </mat-form-field>
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mt-4 sm:mt-6">
@@ -74,6 +85,7 @@ import { MatInputModule } from '@angular/material/input';
 })
 export class ServiceNewComponent implements OnInit {
     @Input() title: string = '';
+    @Input() categories: any[] = [];
     abcForms: any;
     clientForm = new FormGroup({
 
@@ -83,10 +95,25 @@ export class ServiceNewComponent implements OnInit {
         category: new FormControl(null, [Validators.required]),
     });
 
-    constructor(private _matDialog: MatDialogRef<ServiceNewComponent>) {}
+    constructor(
+        private categoryService: CategoryService,
+        private _matDialog: MatDialogRef<ServiceNewComponent>
+    ) {}
 
     ngOnInit() {
         this.abcForms = abcForms;
+        this.loadCategories();
+    }
+
+    private loadCategories(): void {
+        this.categoryService.getCategories().subscribe(
+            (data) => {
+                this.categories = data;
+            },
+            (error) => {
+                console.error('Error al cargar categorías:', error);
+            }
+        );
     }
 
     public saveForm(): void {
@@ -97,6 +124,7 @@ export class ServiceNewComponent implements OnInit {
                 name: null,
                 description: null
             }
+            console.log('Datos enviados al backend:', formData);
             this._matDialog.close(formData);
         }
     }

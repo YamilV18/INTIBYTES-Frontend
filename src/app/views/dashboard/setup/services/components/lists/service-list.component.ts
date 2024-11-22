@@ -29,17 +29,20 @@ import { MatDialog } from '@angular/material/dialog';
                     <table class="w-full table-fixed">
                         <thead class="bg-primary-600 text-white">
                             <tr>
-                                <th class="w-1/6 table-head text-center px-5 border-r">#</th>
-                                <th class="w-2/6 table-header text-center px-5 border-r">
+                                <th class="w-1/12 table-head text-center px-5 border-r">#</th>
+                                <th class="w-1/6 table-header text-center px-5 border-r">
                                     Nombre
                                 </th>
-                                <th class="w-1/6 table-header text-center border-r">
+                                <th class="w-2/6 table-header text-center px-5 border-r">
+                                    Descripción
+                                </th>
+                                <th class="w-1/12 table-header text-center border-r">
                                     Precio
                                 </th>
                                 <th class="w-1/6 table-header text-center border-r">
                                     Categoría
                                 </th>
-                                <th class="w-2/6 table-header text-center">
+                                <th class="w-1/6 table-header text-center">
                                     Acciones
                                 </th>
                             </tr>
@@ -55,10 +58,13 @@ import { MatDialog } from '@angular/material/dialog';
                                     {{ r.name }}
                                 </td>
                                 <td class="w-2/6 p-2  text-start border-b text-sm">
+                                    {{ r.description }}
+                                </td>
+                                <td class="w-2/6 p-2  text-start border-b text-sm">
                                     {{ r.price }}
                                 </td>
                                 <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.category.id }}
+                                    {{ r.category.name }}
                                 </td>
 
                                 <td class="w-2/6 p-2 text-center border-b text-sm">
