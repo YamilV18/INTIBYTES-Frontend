@@ -41,30 +41,15 @@
             <form class="mt-8" [formGroup]="signUpForm" #signUpNgForm="ngForm">
                 <!-- Name field -->
                 <mat-form-field class="w-full">
-                    <mat-label>Nombre Completo</mat-label>
-                    <input id="name" matInput [formControlName]="'name'" />
+                    <mat-label>Nombre de usuario</mat-label>
+                    <input id="userName" matInput [formControlName]="'userName'" />
                     <mat-error
-                        *ngIf="signUpForm.get('name').hasError('required')"
+                        *ngIf="signUpForm.get('userName').hasError('required')"
                     >
-                        Nombre completo requerido
+                        Nombre de usuario requerido
                     </mat-error>
                 </mat-form-field>
 
-                <!-- Email field -->
-                <mat-form-field class="w-full">
-                    <mat-label>Direccion de correo</mat-label>
-                    <input id="email" matInput [formControlName]="'email'" />
-                    <mat-error
-                        *ngIf="signUpForm.get('email').hasError('required')"
-                    >
-                        Se requiere un correo.
-                    </mat-error>
-                    <mat-error
-                        *ngIf="signUpForm.get('email').hasError('email')"
-                    >
-                        Ingresa una direccion de correo valida.
-                    </mat-error>
-                </mat-form-field>
 
                 <!-- Password field -->
                 <!-- Contraseña field -->
@@ -95,40 +80,6 @@
                         <mat-icon
                             class="icon-size-5"
                             *ngIf="passwordField1.type === 'text'"
-                            [svgIcon]="'heroicons_solid:eye-slash'"
-                        ></mat-icon>
-                    </button>
-                    <mat-error> Se requiere contraseña </mat-error>
-                </mat-form-field>
-
-                <!-- Confirmar contraseña field -->
-                <mat-form-field class="w-full">
-                    <mat-label>Confirmar contraseña</mat-label>
-                    <input
-                        id="c_password"
-                        matInput
-                        type="password"
-                        [formControlName]="'c_password'"
-                        #passwordField2
-                    />
-                    <button
-                        mat-icon-button
-                        type="button"
-                        (click)="
-                            passwordField2.type === 'password'
-                                ? (passwordField2.type = 'text')
-                                : (passwordField2.type = 'password')
-                        "
-                        matSuffix
-                    >
-                        <mat-icon
-                            class="icon-size-5"
-                            *ngIf="passwordField2.type === 'password'"
-                            [svgIcon]="'heroicons_solid:eye'"
-                        ></mat-icon>
-                        <mat-icon
-                            class="icon-size-5"
-                            *ngIf="passwordField2.type === 'text'"
                             [svgIcon]="'heroicons_solid:eye-slash'"
                         ></mat-icon>
                     </button>
