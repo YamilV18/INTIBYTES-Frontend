@@ -58,6 +58,7 @@ export class UsersContainerComponent implements OnInit {
         if ($event) {
             const userForm = this._matDialog.open(UserNewComponent);
             userForm.componentInstance.title = 'Nuevo Service' || null;
+            userForm.componentInstance.title = 'Nuevo Client' || null;
             userForm.afterClosed().subscribe((result: any) => {
                 if (result) {
                     this.saveUser(result);
@@ -77,6 +78,7 @@ export class UsersContainerComponent implements OnInit {
         if($event){
             const userForm = this._matDialog.open(UserRolesAsingComponent);
             userForm.componentInstance.title = 'Nuevo Service' || null;
+            userForm.componentInstance.title = 'Nuevo Client' || null;
             userForm.componentInstance.idUser = $event;
             userForm.afterClosed().subscribe((result: any) => {
                 if (result) {
@@ -86,6 +88,7 @@ export class UsersContainerComponent implements OnInit {
         }
         // let userForm = this.modalService.open(UserRolesComponent, {size: 'lg'});
         // userForm.componentInstance.title = 'Asignar Service a Usuario' || null;
+        // userForm.componentInstance.title = 'Asignar Client a Usuario' || null;
         // userForm.componentInstance.idUser = $event;
         // userForm.result.then((result) => {
         //   if (result) {

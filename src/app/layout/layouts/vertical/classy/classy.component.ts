@@ -165,6 +165,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
                         type: 'basic',
                         icon: 'heroicons_outline:chart-pie',
                         link: '/homeScreen/setup/review',
+
                     },
                 ],
             },

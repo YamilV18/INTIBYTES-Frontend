@@ -1,5 +1,7 @@
 import {DecimalPipe} from "@angular/common";
 
+import {EnumValue} from "@angular/compiler-cli/src/ngtsc/partial_evaluator";
+
 export class Billing {
 
     id?: number;
@@ -7,5 +9,21 @@ export class Billing {
     expiration_date?: Date;
     issue_date?: Date;
     state?: string;
-    subscription_id?: number;
+    subscriptions?: {
+        id: number;
+        user_id: string;
+        start_date: Date;
+        end_date: Date;
+        status: EnumValue;
+    };
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+        password: string;
+        role: EnumValue;
+        star_date: Date;
+        end_date: Date;
+        status: Boolean;
+    }
 }

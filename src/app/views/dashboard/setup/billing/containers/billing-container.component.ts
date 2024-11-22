@@ -61,9 +61,11 @@ export class BillingContainerComponent implements OnInit {
 
     public eventNew($event: boolean): void {
         if ($event) {
+
             const billingForm = this._matDialog.open(BillingNewComponent);
             billingForm.componentInstance.title = 'Nuevo Historial' || null;
             billingForm.afterClosed().subscribe((result: any) => {
+
                 if (result) {
                     this.saveClient(result);
                 }

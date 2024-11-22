@@ -16,6 +16,7 @@ export const END_POINTS = {
       category: 'category',
       billing: 'billing',
       subscription: 'subscription',
+      user: 'user',
     accesRole: 'acceso-rol',
     person: 'persona',
     institution: 'institucion',

@@ -63,6 +63,7 @@ export class ClientContainerComponent implements OnInit {
         if ($event) {
             const clienteForm = this._matDialog.open(ClientNewComponent);
             clienteForm.componentInstance.title = 'Nuevo Service' || null;
+            clienteForm.componentInstance.title = 'Nuevo Client' || null;
             clienteForm.afterClosed().subscribe((result: any) => {
                 if (result) {
                     this.saveClient(result);

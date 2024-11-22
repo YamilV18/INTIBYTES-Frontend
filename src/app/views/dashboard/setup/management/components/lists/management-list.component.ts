@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { abcForms } from '../../../../../../../environments/generals';
-import { Billing } from '../../models/billing';
+import { Management } from '../../models/management';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
-    selector: 'app-billings-list',
+    selector: 'app-management-list',
     imports: [CommonModule, RouterOutlet, MatButtonModule, MatIconModule],
     standalone: true,
     template: `
@@ -17,11 +17,11 @@ import { MatDialog } from '@angular/material/dialog';
             <!-- Encabezado principal -->
             <div class="flex justify-between items-center mb-2 bg-slate-300 text-black p-4 rounded">
                 <h2 class="text-2xl font-bold">
-                    Lista de <span class="text-primary">Historial de Compras</span>
+                    Lista de <span class="text-primary">Usuarios</span>
                 </h2>
                 <button mat-flat-button [color]="'primary'" (click)="goNew()">
                     <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                    <span class="ml-2">Nuevo Historial</span>
+                    <span class="ml-2">Nuevo Usuario</span>
                 </button>
             </div>
             <div class="bg-white rounded overflow-hidden shadow-lg">
@@ -31,53 +31,59 @@ import { MatDialog } from '@angular/material/dialog';
                             <tr>
                                 <th class="w-1/6 table-head text-center px-5 border-r">#</th>
                                 <th class="w-2/6 table-header text-center px-5 border-r">
-                                    Cantidad
+                                    Nombre
                                 </th>
                                 <th class="w-1/6 table-header text-center border-r">
-                                    Fecha de Vencimiento
+                                    Email
                                 </th>
-                                <th class="w-2/6 table-header text-center">
-                                    Fecha de Emisión
+                                <th class="w-1/6 table-header text-center border-r">
+                                    Contraseña
                                 </th>
-                                <th class="w-2/6 table-header text-center">
+                                <th class="w-1/6 table-header text-center border-r">
+                                    Rol
+                                </th>
+                                <th class="w-1/6 table-header text-center border-r">
+                                    Fecha de Inicio
+                                </th>
+                                <th class="w-1/6 table-header text-center border-r">
+                                    Fecha de Termino
+                                </th>
+                                <th class="w-1/6 table-header text-center border-r">
                                     Estado
                                 </th>
                                 <th class="w-2/6 table-header text-center">
                                     Acciones
                                 </th>
-
                             </tr>
                         </thead>
                         <tbody
                             class="bg-white"
-                            *ngFor="let r of billings; let i = index">
+                            *ngFor="let r of managements; let i = index">
                             <tr class="hover:bg-gray-100">
                                 <td class="w-1/6 p-2 text-center border-b">
                                     {{ i }}
                                 </td>
                                 <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.amount }}
+                                    {{ r.name }}
                                 </td>
                                 <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.expiration_date }}
+                                    {{ r.email }}
                                 </td>
                                 <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.issue_date }}
+                                    {{ r.password }}
                                 </td>
                                 <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.state }}
+                                    {{ r.role }}
                                 </td>
-<<<<<<< HEAD
-                                <td class="w-1/6 p-2 text-center border-b text-sm">
-                                    <div
-                                        class="relative grid items-center font-sans font-bold uppercase whitespace-nowrap select-none bg-green-500/20 text-green-600 py-1 px-2 text-xs rounded-md"
-                                        style="opacity: 1">
-                                        <span class="">ACTIVO</span>
-                                    </div>
+                                <td class="w-2/6 p-2 text-start border-b text-sm">
+                                    {{ r.starDate | date:'yyyy-MM-dd HH:mm:ss' }}
                                 </td>
-=======
-
->>>>>>> origin/nick
+                                <td class="w-2/6 p-2 text-start border-b text-sm">
+                                    {{ r.endDate | date:'yyyy-MM-dd HH:mm:ss' }}
+                                </td>
+                                <td class="w-2/6 p-2  text-start border-b text-sm">
+                                    {{ r.status }}
+                                </td>
 
                                 <td class="w-2/6 p-2 text-center border-b text-sm">
                                     <div class="flex justify-center space-x-3">
@@ -115,9 +121,9 @@ import { MatDialog } from '@angular/material/dialog';
         </div>
     `,
 })
-export class BillingListComponent implements OnInit {
+export class ManagementListComponent implements OnInit {
     abcForms: any;
-    @Input() billings: Billing[] = [];
+    @Input() managements: Management[] = [];
     @Output() eventNew = new EventEmitter<boolean>();
     @Output() eventEdit = new EventEmitter<number>();
     @Output() eventDelete = new EventEmitter<number>();
