@@ -57,7 +57,10 @@ export class UsersContainerComponent implements OnInit {
     public eventNew($event: boolean): void {
         if ($event) {
             const userForm = this._matDialog.open(UserNewComponent);
+<<<<<<< HEAD
             userForm.componentInstance.title = 'Nuevo Service' || null;
+=======
+>>>>>>> origin/henyel
             userForm.componentInstance.title = 'Nuevo Client' || null;
             userForm.afterClosed().subscribe((result: any) => {
                 if (result) {
@@ -77,7 +80,10 @@ export class UsersContainerComponent implements OnInit {
     eventAssign($event: number) {
         if($event){
             const userForm = this._matDialog.open(UserRolesAsingComponent);
+<<<<<<< HEAD
             userForm.componentInstance.title = 'Nuevo Service' || null;
+=======
+>>>>>>> origin/henyel
             userForm.componentInstance.title = 'Nuevo Client' || null;
             userForm.componentInstance.idUser = $event;
             userForm.afterClosed().subscribe((result: any) => {

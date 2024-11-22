@@ -167,6 +167,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
                         link: '/homeScreen/setup/review',
 
                     },
+
                 ],
             },
 

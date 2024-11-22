@@ -11,12 +11,14 @@ export const END_POINTS = {
   },
   setup: {
     role: 'rol',
+
       client: 'cliente',
       service: 'service',
       category: 'category',
       billing: 'billing',
       subscription: 'subscription',
       user: 'user',
+      review: 'review',
     accesRole: 'acceso-rol',
     person: 'persona',
     institution: 'institucion',
