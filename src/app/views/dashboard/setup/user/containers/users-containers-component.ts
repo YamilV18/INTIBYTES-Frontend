@@ -57,10 +57,6 @@ export class UsersContainerComponent implements OnInit {
     public eventNew($event: boolean): void {
         if ($event) {
             const userForm = this._matDialog.open(UserNewComponent);
-<<<<<<< HEAD
-            userForm.componentInstance.title = 'Nuevo Service' || null;
-=======
->>>>>>> origin/henyel
             userForm.componentInstance.title = 'Nuevo Client' || null;
             userForm.afterClosed().subscribe((result: any) => {
                 if (result) {
