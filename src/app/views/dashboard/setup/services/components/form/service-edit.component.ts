@@ -46,7 +46,7 @@ import {NgForOf} from "@angular/common";
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Price</mat-label>
-                <input matInput formControlName="price" />
+                <input matInput formControlName="price" type="number"/>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>Categoría</mat-label>
