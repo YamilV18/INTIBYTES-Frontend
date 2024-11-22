@@ -58,7 +58,7 @@ import { MatDialog } from '@angular/material/dialog';
                                     {{ r.price }}
                                 </td>
                                 <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.category_id }}
+                                    {{ r.category.id }}
                                 </td>
 
                                 <td class="w-2/6 p-2 text-center border-b text-sm">

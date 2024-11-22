@@ -57,7 +57,7 @@ import { MatInputModule } from '@angular/material/input';
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>ID_Categoría</mat-label>
-                    <input matInput formControlName="category_id" />
+                    <input matInput formControlName="category" />
                 </mat-form-field>
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mt-4 sm:mt-6">
@@ -80,7 +80,7 @@ export class ServiceNewComponent implements OnInit {
         name: new FormControl('', [Validators.required]),
         description: new FormControl('', [Validators.required]),
         price: new FormControl('', [Validators.required]),
-        category_id: new FormControl('', [Validators.required]),
+        category: new FormControl(null, [Validators.required]),
     });
 
     constructor(private _matDialog: MatDialogRef<ServiceNewComponent>) {}
@@ -91,7 +91,13 @@ export class ServiceNewComponent implements OnInit {
 
     public saveForm(): void {
         if (this.clientForm.valid) {
-            this._matDialog.close(this.clientForm.value);
+            const formData = this.clientForm.value;
+            formData.category = {
+                id: formData.category,
+                name: null,
+                description: null
+            }
+            this._matDialog.close(formData);
         }
     }
 

@@ -4,5 +4,9 @@ export class Service {
     name?: string;
     description?: string;
     price?: string;
-    category_id?: string;
+    category?: {
+        id: number;
+        name: string;
+        description: string;
+    };
 }

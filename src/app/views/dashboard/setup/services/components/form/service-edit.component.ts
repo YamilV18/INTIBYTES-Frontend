@@ -46,7 +46,7 @@ import {MatDialogRef} from "@angular/material/dialog";
             </mat-form-field>
             <mat-form-field>
                 <mat-label>ID Categoría</mat-label>
-                <input matInput formControlName="category_id" />
+                <input matInput formControlName="category" />
             </mat-form-field>
             <!-- Actions -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between mt-4 sm:mt-6">
@@ -66,7 +66,7 @@ export class ServiceEditComponent implements OnInit {
         name: new FormControl('', [Validators.required]),
         description: new FormControl('', [Validators.required]),
         price: new FormControl('', [Validators.required]),
-        category_id: new FormControl('', [Validators.required]),
+        category: new FormControl(null, [Validators.required]),
     });
   @Input() title: string = '';
   @Input() client = new Service();
@@ -81,17 +81,25 @@ export class ServiceEditComponent implements OnInit {
   ngOnInit() {
     this.abcForms = abcForms;
 
-    if (this.client) {
-        console.log(this.client);
-      this.clientForm.patchValue(this.client);
-    }
+      if (this.client) {
+          this.clientForm.patchValue({
+              ...this.client,
+              category: this.client.category.id || null,
+          });
+      }
   }
 
-  public saveForm(): void {
-    if (this.clientForm.valid) {
-      this._matDialog.close(this.clientForm.value);
+    public saveForm(): void {
+        if (this.clientForm.valid) {
+            const formData = this.clientForm.value;
+            formData.category = {
+                id: formData.category,
+                name: null,
+                description: null
+            }
+            this._matDialog.close(formData);
+        }
     }
-  }
 
   public cancelForm(): void {
     this._matDialog.close('');
