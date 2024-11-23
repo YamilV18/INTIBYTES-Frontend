@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 
 import { abcForms } from '../../../../../../../environments/generals';
 import { Subscription } from '../../models/subscription';
@@ -7,10 +7,11 @@ import { RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
+import {FormsModule} from "@angular/forms";
 
 @Component({
     selector: 'app-subscriptions-list',
-    imports: [CommonModule, RouterOutlet, MatButtonModule, MatIconModule],
+    imports: [CommonModule, RouterOutlet, MatButtonModule, MatIconModule, FormsModule],
     standalone: true,
     template: `
         <div class="w-full mx-auto p-6 bg-white rounded overflow-hidden shadow-lg">
@@ -24,76 +25,172 @@ import { MatDialog } from '@angular/material/dialog';
                     <span class="ml-2">Nuevo Historial</span>
                 </button>
             </div>
+            <!-- Filtro de Estado -->
+            <div class="bg-gray-100 rounded p-2 mb-4">
+                <div class="flex">
+                    <div class="flex-1">
+                        <div class="px-4 sm:px-6 py-2">
+                            <div class="font-semibold text-lg mb-1">Filtro de Estado</div>
+                            <select
+                                class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                                [(ngModel)]="filterStatus"
+                                (change)="applyFilters()"
+                            >
+                                <option value="">Todos</option>
+                                <option value="1">Activo</option>
+                                <option value="0">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tabla -->
             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                 <div class="p-4 overflow-auto">
                     <table class="w-full table-fixed border-collapse">
                         <thead class="bg-blue-600 text-white">
-                        <tr>
-                            <th class="w-1/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">#</th>
-                            <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
-                                Fecha de Vencimiento
-                            </th>
-                            <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
-                                Fecha de Emisión
-                            </th>
-                            <th class="w-2/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">Estado</th>
-                            <th class="w-3/12 py-3 px-4 text-center text-sm font-semibold uppercase">Acciones</th>
-                        </tr>
+                            <tr>
+                                <th class="w-1/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">#</th>
+                                <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
+                                    Fecha de Vencimiento
+                                </th>
+                                <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
+                                    Fecha de Emisión
+                                </th>
+                                <th class="w-2/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">Estado</th>
+                                <th class="w-3/12 py-3 px-4 text-center text-sm font-semibold uppercase">Acciones</th>
+                            </tr>
                         </thead>
-                        <tbody *ngFor="let r of subscriptions; let i = index" class="bg-gray-50">
-                        <tr class="hover:bg-gray-100">
-                            <td class="py-2 px-4 text-center border-b text-gray-700">{{ i + 1 }}</td>
-                            <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
-                                {{ r.enddate }}
-                            </td>
-                            <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
-                                {{ r.stardate }}
-                            </td>
-                            <td class="py-2 px-4 text-center border-b text-sm">
-                        <span
-                            class="px-2 py-1 rounded-full text-xs font-medium"
-                            [ngClass]="{
-                                'bg-green-100 text-green-700': r.status === 'activo',
-                                'bg-red-100 text-red-700': r.status === 'inactivo'
-                            }"
+                        <tbody
+                            *ngFor="let r of filteredSubscriptions.slice(pageStart - 1, pageEnd); let i = index"
+                            class="bg-gray-50"
                         >
-                            {{ r.status }}
-                        </span>
-                            </td>
-                            <td class="py-2 px-4 text-center border-b text-sm">
-                                <div class="flex justify-center space-x-3">
-                                    <mat-icon
-                                        class="text-blue-500 hover:text-blue-600 cursor-pointer"
-                                        (click)="goEdit(r.id)"
-                                    >edit</mat-icon
+                            <tr class="hover:bg-gray-100">
+                                <td class="py-2 px-4 text-center border-b text-gray-700">{{ i + pageStart }}</td>
+                                <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
+                                    {{ r.enddate }}
+                                </td>
+                                <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
+                                    {{ r.stardate }}
+                                </td>
+                                <td class="py-2 px-4 text-center border-b text-sm">
+                                    <span
+                                        class="px-2 py-1 rounded-full text-xs font-medium"
+                                        [ngClass]="{
+                                            'bg-green-100 text-green-700': r.status === 'activo',
+                                            'bg-red-100 text-red-700': r.status === 'inactivo'
+                                        }"
                                     >
-                                    <mat-icon
-                                        class="text-red-500 hover:text-red-600 cursor-pointer"
-                                        (click)="goDelete(r.id)"
-                                    >delete_sweep</mat-icon
-                                    >
-                                </div>
-                            </td>
-                        </tr>
+                                        {{ r.status }}
+                                    </span>
+                                </td>
+                                <td class="py-2 px-4 text-center border-b text-sm">
+                                    <div class="flex justify-center space-x-3">
+                                        <mat-icon
+                                            class="text-blue-500 hover:text-blue-600 cursor-pointer"
+                                            (click)="goEdit(r.id)"
+                                            >edit</mat-icon
+                                        >
+                                        <mat-icon
+                                            class="text-red-500 hover:text-red-600 cursor-pointer"
+                                            (click)="goDelete(r.id)"
+                                            >delete_sweep</mat-icon
+                                        >
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
+                    <!-- Paginación -->
+                    <div
+                        class="px-5 py-2 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between"
+                    >
+                        <span class="text-xs xs:text-sm text-gray-900">
+                            Mostrando {{ pageStart }} a {{ pageEnd }} de {{ subscriptions.length }} Entradas
+                        </span>
+                        <div class="inline-flex mt-2 xs:mt-0">
+                            <button
+                                class="text-sm text-primary-50 transition duration-150 hover:bg-primary-500 bg-primary-600 font-semibold py-2 px-4 rounded-l"
+                                (click)="goToPage(page - 1)"
+                                [disabled]="page === 1"
+                            >
+                                Prev
+                            </button>
+                            &nbsp; &nbsp;
+                            <button
+                                class="text-sm text-primary-50 transition duration-150 hover:bg-primary-500 bg-primary-600 font-semibold py-2 px-4 rounded-r"
+                                (click)="goToPage(page + 1)"
+                                [disabled]="page === totalPages"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-
+        </div>
     `,
 })
-export class SubscriptionListComponent implements OnInit {
+export class SubscriptionListComponent implements OnInit, OnChanges {
     abcForms: any;
     @Input() subscriptions: Subscription[] = [];
     @Output() eventNew = new EventEmitter<boolean>();
     @Output() eventEdit = new EventEmitter<number>();
     @Output() eventDelete = new EventEmitter<number>();
-    @Output() eventAssign = new EventEmitter<number>();
+
+    filterStatus: string = '';
+    filteredSubscriptions: Subscription[] = [];
+
+    // Paginación
+    page: number = 1;
+    pageSize: number = 10;
+    totalPages: number = 1;
+    pageStart: number = 1;
+    pageEnd: number = 10;
 
     constructor(private _matDialog: MatDialog) {}
 
     ngOnInit() {
         this.abcForms = abcForms;
+        this.applyFilters();
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['subscriptions'] && changes['subscriptions'].currentValue) {
+            this.applyFilters();
+            this.calculateTotalPages();
+            this.updatePageData();
+        }
+    }
+
+    public applyFilters(): void {
+        this.page = 1;
+        this.filteredSubscriptions = this.subscriptions.filter((sub) => {
+            return this.filterStatus
+                ? sub.status === (this.filterStatus === '1' ? 'activo' : 'inactivo')
+                : true;
+        });
+        this.calculateTotalPages();
+        this.updatePageData();
+    }
+
+    private calculateTotalPages(): void {
+        this.totalPages = Math.ceil(this.filteredSubscriptions.length / this.pageSize);
+    }
+
+    private updatePageData(): void {
+        const startIndex = (this.page - 1) * this.pageSize;
+        const endIndex = startIndex + this.pageSize;
+        this.pageStart = startIndex + 1;
+        this.pageEnd =
+            endIndex < this.filteredSubscriptions.length ? endIndex : this.filteredSubscriptions.length;
+    }
+
+    public goToPage(pageNumber: number): void {
+        if (pageNumber >= 1 && pageNumber <= this.totalPages) {
+            this.page = pageNumber;
+            this.updatePageData();
+        }
     }
 
     public goNew(): void {
@@ -106,9 +203,5 @@ export class SubscriptionListComponent implements OnInit {
 
     public goDelete(id: number): void {
         this.eventDelete.emit(id);
-    }
-
-    public goAssign(id: number): void {
-        this.eventAssign.emit(id);
     }
 }

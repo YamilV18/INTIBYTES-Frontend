@@ -211,13 +211,15 @@ export class ServiceListComponent implements OnInit, OnChanges {
             }
         );
     }
-    // Función que actualiza el filtro
     public applyFilters(): void {
+        this.page = 1;
         this.filteredServices = this.service.filter((service) => {
             const matchesName = service.name.toLowerCase().includes(this.filterName.toLowerCase());
             const matchesCategory = this.filterCategory ? service.category.id === +this.filterCategory : true;
             return matchesName && matchesCategory;
         });
+        this.calculateTotalPages();
+        this.updatePageData();
     }
 
     private calculateTotalPages(): void {

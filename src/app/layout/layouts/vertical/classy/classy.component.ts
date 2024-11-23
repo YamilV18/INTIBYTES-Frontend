@@ -157,7 +157,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
                         title: 'Setup Facturación',
                         type: 'basic',
                         icon: 'heroicons_outline:chart-pie',
-                        link: '/homeScreen/setup/Management',
+                        link: '/homeScreen/setup/management',
                     },
                     {
                         id: 'SetupReview',
