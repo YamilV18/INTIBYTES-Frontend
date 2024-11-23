@@ -140,28 +140,28 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
                 children: [
                     {
                         id: 'SetupService',
-                        title: 'Setup Servicio',
+                        title: 'Servicios',
                         type: 'basic',
                         icon: 'heroicons_outline:chart-pie',
                         link: '/homeScreen/setup/service',
                     },
                     {
                         id: 'SetupSubscription',
-                        title: 'Setup Suscripción',
+                        title: 'Historial de Compras',
                         type: 'basic',
                         icon: 'heroicons_outline:chart-pie',
                         link: '/homeScreen/setup/subscription',
                     },
                     {
                         id: 'SetupBilling',
-                        title: 'Setup Facturación',
+                        title: 'Usuarios',
                         type: 'basic',
                         icon: 'heroicons_outline:chart-pie',
                         link: '/homeScreen/setup/management',
                     },
                     {
                         id: 'SetupReview',
-                        title: 'Setup Reseña',
+                        title: 'Mis Reseñas',
                         type: 'basic',
                         icon: 'heroicons_outline:chart-pie',
                         link: '/homeScreen/setup/review',
