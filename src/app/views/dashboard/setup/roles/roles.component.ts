@@ -11,7 +11,7 @@
 //   `,
 // })
 // export class CategoryComponent implements OnInit {
-// export class ClientComponent implements OnInit {
+// export class ChatListComponent implements OnInit {
 //
 //   public title: string = '';
 //   abcForms:any;

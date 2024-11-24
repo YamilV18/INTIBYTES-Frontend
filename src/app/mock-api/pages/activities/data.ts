@@ -72,7 +72,7 @@ export const activities = [
         image        : 'assets/images/avatars/female-02.jpg',
         description  : '<strong>Tina Harris</strong> started a chat with you',
         date         : now.minus({day: 1}).toISO(), // 1 day ago,
-        linkedContent: 'Go to Chat (Tina Harris)',
+        linkedContent: 'Go to ChatMessage (Tina Harris)',
         link         : '/apps/chat/5636c0ba-fa47-42ca-9160-27340583041e',
         useRouter    : true,
     },

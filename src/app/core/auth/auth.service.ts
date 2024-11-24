@@ -32,7 +32,10 @@ export class AuthService
     // -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
-
+    getUserId(): string {
+        // Asegúrate de que el usuario esté configurado en _userService.user
+        return this._userService.user?.id ?? ''; // Cambia 'id' por la clave correspondiente al ID del usuario
+    }
     /**
      * Forgot password
      *
