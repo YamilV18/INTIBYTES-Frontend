@@ -51,78 +51,78 @@ import {Service} from "../../../services/models/service";
                 <div class="p-2 overflow-scroll px-0">
                     <table class="w-full table-fixed">
                         <thead class="bg-primary-600 text-white">
-                            <tr>
-                                <th class="w-1/6 table-head text-center px-5 border-r">#</th>
-                                <th class="w-2/6 table-header text-center px-5 border-r">
-                                    Nombre
-                                </th>
-                                <th class="w-1/6 table-header text-center border-r">
-                                    Email
-                                </th>
-                                <th class="w-1/6 table-header text-center border-r">
-                                    Contraseña
-                                </th>
-                                <th class="w-1/6 table-header text-center border-r">
-                                    Rol
-                                </th>
-                                <th class="w-1/6 table-header text-center border-r">
-                                    Fecha de Inicio
-                                </th>
-                                <th class="w-1/6 table-header text-center border-r">
-                                    Fecha de Termino
-                                </th>
-                                <th class="w-1/6 table-header text-center border-r">
-                                    Estado
-                                </th>
-                                <th class="w-2/6 table-header text-center">
-                                    Acciones
-                                </th>
-                            </tr>
+                        <tr>
+                            <th class="w-1/6 table-head text-center px-5 border-r">#</th>
+                            <th class="w-2/6 table-header text-center px-5 border-r">
+                                Nombre
+                            </th>
+                            <th class="w-1/6 table-header text-center border-r">
+                                Email
+                            </th>
+                            <th class="w-1/6 table-header text-center border-r">
+                                Contraseña
+                            </th>
+                            <th class="w-1/6 table-header text-center border-r">
+                                Rol
+                            </th>
+                            <th class="w-1/6 table-header text-center border-r">
+                                Fecha de Inicio
+                            </th>
+                            <th class="w-1/6 table-header text-center border-r">
+                                Fecha de Termino
+                            </th>
+                            <th class="w-1/6 table-header text-center border-r">
+                                Estado
+                            </th>
+                            <th class="w-2/6 table-header text-center">
+                                Acciones
+                            </th>
+                        </tr>
                         </thead>
                         <tbody
                             class="bg-white"
                             *ngFor="let r of filteredManagement.slice(pageStart - 1, pageEnd); let i = index">
-                            <tr class="hover:bg-gray-100">
-                                <td class="w-1/6 p-2 text-center border-b">
-                                    {{ i }}
-                                </td>
-                                <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.name }}
-                                </td>
-                                <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.email }}
-                                </td>
-                                <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.password }}
-                                </td>
-                                <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.role }}
-                                </td>
-                                <td class="w-2/6 p-2 text-start border-b text-sm">
-                                    {{ r.starDate | date:'yyyy-MM-dd HH:mm:ss' }}
-                                </td>
-                                <td class="w-2/6 p-2 text-start border-b text-sm">
-                                    {{ r.endDate | date:'yyyy-MM-dd HH:mm:ss' }}
-                                </td>
-                                <td class="w-2/6 p-2  text-start border-b text-sm">
-                                    {{ r.status }}
-                                </td>
+                        <tr class="hover:bg-gray-100">
+                            <td class="w-1/6 p-2 text-center border-b">
+                                {{ i }}
+                            </td>
+                            <td class="w-2/6 p-2  text-start border-b text-sm">
+                                {{ r.name }}
+                            </td>
+                            <td class="w-2/6 p-2 text-start border-b text-sm truncate" style="max-width: 150px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                {{ r.email }}
+                            </td>
+                            <td class="w-2/6 p-2  text-start border-b text-sm">
+                                {{ r.password }}
+                            </td>
+                            <td class="w-2/6 p-2  text-start border-b text-sm">
+                                {{ r.role }}
+                            </td>
+                            <td class="w-2/6 p-2 text-start border-b text-sm">
+                                {{ r.starDate | date: 'longDate' }}
+                            </td>
+                            <td class="w-2/6 p-2 text-start border-b text-sm">
+                                {{ r.endDate | date: 'longDate' }}
+                            </td>
+                            <td class="w-2/6 p-2  text-start border-b text-sm">
+                                {{ r.status }}
+                            </td>
 
-                                <td class="w-2/6 p-2 text-center border-b text-sm">
-                                    <div class="flex justify-center space-x-3">
-                                        <mat-icon class="text-amber-400 hover:text-amber-500 cursor-pointer"
-                                            (click)="goEdit(r.id)">edit</mat-icon>
+                            <td class="w-2/6 p-2 text-center border-b text-sm">
+                                <div class="flex justify-center space-x-3">
+                                    <mat-icon class="text-amber-400 hover:text-amber-500 cursor-pointer"
+                                              (click)="goEdit(r.id)">edit</mat-icon>
 
-                                        <mat-icon class="text-rose-500 hover:text-rose-600 cursor-pointer"
-                                            (click)="goDelete(r.id)">delete_sweep</mat-icon>
-                                       <!-- <mat-icon
-                                            class="text-sky-400 hover:text-sky-600 cursor-pointer"
-                                            (click)="goAssign(r.id)"
-                                            >swap_horiz
-                                        </mat-icon>-->
-                                    </div>
-                                </td>
-                            </tr>
+                                    <mat-icon class="text-rose-500 hover:text-rose-600 cursor-pointer"
+                                              (click)="goDelete(r.id)">delete_sweep</mat-icon>
+                                    <!-- <mat-icon
+                                         class="text-sky-400 hover:text-sky-600 cursor-pointer"
+                                         (click)="goAssign(r.id)"
+                                         >swap_horiz
+                                     </mat-icon>-->
+                                </div>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                     <!-- paginación -->

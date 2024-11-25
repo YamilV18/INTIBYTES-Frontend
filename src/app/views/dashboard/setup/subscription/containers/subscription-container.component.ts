@@ -6,9 +6,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { SubscriptionNewComponent } from '../components/form/subscription-new.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SubscriptionEditComponent } from '../components/form/subscription-edit.component';
-import {ConfirmDialogService} from "../../../../../shared/confirm-dialog/confirm-dialog.service";
-import {SubscriptionService} from "../../../../../providers/services/setup/subscription.service";
-import {SubscriptionListComponent} from "../components/lists/subscription-list.component";
+import { ConfirmDialogService } from '../../../../../shared/confirm-dialog/confirm-dialog.service';
+import { SubscriptionService } from '../../../../../providers/services/setup/subscription.service';
+import { SubscriptionListComponent } from '../components/lists/subscription-list.component';
 
 @Component({
     selector: 'app-clients-container',
@@ -28,7 +28,6 @@ import {SubscriptionListComponent} from "../components/lists/subscription-list.c
             [subscriptions]="subscriptions"
             (eventNew)="eventNew($event)"
             (eventEdit)="eventEdit($event)"
-
             (eventDelete)="eventDelete($event)"
         ></app-subscriptions-list>
     `,
@@ -40,8 +39,8 @@ export class SubscriptionContainerComponent implements OnInit {
 
     constructor(
         private _subscriptionService: SubscriptionService,
-        private _confirmDialogService:ConfirmDialogService,
-        private _matDialog: MatDialog,
+        private _confirmDialogService: ConfirmDialogService,
+        private _matDialog: MatDialog
     ) {}
 
     ngOnInit() {
@@ -49,82 +48,112 @@ export class SubscriptionContainerComponent implements OnInit {
     }
 
     getClients(): void {
-        this._subscriptionService.getAll$().subscribe(
-            (response) => {
+        this._subscriptionService.getAll$().subscribe({
+            next: (response) => {
                 this.subscriptions = response;
             },
-            (error) => {
+            error: (error) => {
                 this.error = error;
-            }
-        );
+            },
+        });
     }
 
     public eventNew($event: boolean): void {
         if ($event) {
-            const clienteForm = this._matDialog.open(SubscriptionNewComponent);
-            clienteForm.componentInstance.title = 'Nuevo Historial' || null;
-            clienteForm.afterClosed().subscribe((result: any) => {
+            const subscriptionForm = this._matDialog.open(SubscriptionNewComponent);
+            subscriptionForm.componentInstance.title = 'Nueva Suscripción';
+
+            subscriptionForm.afterClosed().subscribe((result: any) => {
                 if (result) {
-                    this.saveClient(result);
+                    console.log('Datos recibidos para nueva suscripción:', result);
+                    this.saveSubscription(result);
                 }
             });
         }
     }
 
-    saveClient(data: Object): void {
-        this._subscriptionService.add$(data).subscribe((response) => {
-            if (response) {
-                this.getClients()
-            }
+    saveSubscription(data: any): void {
+        const payload = {
+            serviceId: data.serviceId, // ID del servicio
+            user: data.user || null, // Usuario completo
+            starDate: data.starDate ? new Date(data.starDate).toISOString() : null, // Formato ISO para la fecha
+            endDate: data.endDate ? new Date(data.endDate).toISOString() : null, // Formato ISO para la fecha
+            status: data.status, // Estado
+        };
+
+        console.log('Payload enviado al backend:', payload); // Debug
+
+        this._subscriptionService.add$(payload).subscribe({
+            next: (response) => {
+                console.log('Respuesta del backend (guardar):', response);
+                this.getClients(); // Actualizar la lista
+            },
+            error: (err) => {
+                console.error('Error al guardar la suscripción:', err);
+            },
         });
     }
 
+
+
+
+
     eventEdit(idClient: number): void {
-        const listById = this._subscriptionService
-            .getById$(idClient)
-            .subscribe(async (response) => {
-                this.subscription = (response) || {};
+        const subscriptionById = this._subscriptionService.getById$(idClient).subscribe({
+            next: (response) => {
+                this.subscription = response || {};
                 this.openModalEdit(this.subscription);
-                listById.unsubscribe();
-            });
+                subscriptionById.unsubscribe();
+            },
+            error: (err) => {
+                console.error('Error al obtener suscripción para edición:', err);
+            },
+        });
     }
 
     openModalEdit(data: Subscription) {
-        console.log(data);
         if (data) {
-            const clienteForm = this._matDialog.open(SubscriptionEditComponent);
-            clienteForm.componentInstance.title =`Editar <b>${data.status||data.id} </b>`;
-            clienteForm.componentInstance.subscription = data;
-            clienteForm.afterClosed().subscribe((result: any) => {
+            const subscriptionForm = this._matDialog.open(SubscriptionEditComponent);
+            subscriptionForm.componentInstance.title = `Editar Suscripción ${data.id}`;
+            subscriptionForm.componentInstance.subscription = data;
+
+            subscriptionForm.afterClosed().subscribe((result: any) => {
                 if (result) {
-                    this.editClient( data.id,result);
+                    console.log('Datos recibidos para edición:', result);
+                    this.editClient(data.id, result);
                 }
             });
         }
     }
 
-    editClient( idClient: number,data: Object) {
-        this._subscriptionService.update$(idClient,data).subscribe((response) => {
-            if (response) {
-                this.getClients()
-            }
+    editClient(idClient: number, data: any): void {
+        this._subscriptionService.update$(idClient, data).subscribe({
+            next: (response) => {
+                console.log('Suscripción actualizada correctamente:', response);
+                this.getClients(); // Actualizar lista
+            },
+            error: (err) => {
+                console.error('Error al actualizar la suscripción:', err);
+            },
         });
     }
 
-
-    public eventDelete(idClient: number) {
-        this._confirmDialogService.confirmDelete(
-            {
-                // title: 'Confirmación Personalizada',
-                // message: `¿Quieres proceder con esta acción ${}?`,
-            }
-        ).then(() => {
-            this._subscriptionService.delete$(idClient).subscribe((response) => {
-                this.subscriptions = response;
+    public eventDelete(idClient: number): void {
+        this._confirmDialogService
+            .confirmDelete({})
+            .then(() => {
+                this._subscriptionService.delete$(idClient).subscribe({
+                    next: (response) => {
+                        console.log('Suscripción eliminada correctamente:', response);
+                        this.getClients(); // Actualizar lista
+                    },
+                    error: (err) => {
+                        console.error('Error al eliminar la suscripción:', err);
+                    },
+                });
+            })
+            .catch(() => {
+                console.log('Eliminación cancelada.');
             });
-            this.getClients();
-        }).catch(() => {
-        });
-
     }
 }

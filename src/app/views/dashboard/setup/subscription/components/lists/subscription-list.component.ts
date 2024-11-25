@@ -49,31 +49,42 @@ import {FormsModule} from "@angular/forms";
                 <div class="p-4 overflow-auto">
                     <table class="w-full table-fixed border-collapse">
                         <thead class="bg-blue-600 text-white">
-                            <tr>
-                                <th class="w-1/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">#</th>
-                                <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
-                                    Fecha de Vencimiento
-                                </th>
-                                <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
-                                    Fecha de Emisión
-                                </th>
-                                <th class="w-2/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">Estado</th>
-                                <th class="w-3/12 py-3 px-4 text-center text-sm font-semibold uppercase">Acciones</th>
-                            </tr>
+                        <tr>
+
+
+                            <th class="w-1/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">#</th>
+                            <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
+                                Nombre del Servicio
+                            </th>
+                            <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
+                                Fecha de Vencimiento
+                            </th>
+                            <th class="w-3/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">
+                                Fecha de Emisión
+                            </th>
+                            <th class="w-2/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">Estado</th>
+                            <th class="w-2/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">Nombre Usuario</th>
+                            <th class="w-2/12 py-3 px-4 border-r text-center text-sm font-semibold uppercase">Rol Usuario</th>
+                            <th class="w-3/12 py-3 px-4 text-center text-sm font-semibold uppercase">Acciones</th>
+                        </tr>
                         </thead>
                         <tbody
                             *ngFor="let r of filteredSubscriptions.slice(pageStart - 1, pageEnd); let i = index"
                             class="bg-gray-50"
                         >
-                            <tr class="hover:bg-gray-100">
-                                <td class="py-2 px-4 text-center border-b text-gray-700">{{ i + pageStart }}</td>
-                                <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
-                                    {{ r.enddate }}
-                                </td>
-                                <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
-                                    {{ r.stardate }}
-                                </td>
-                                <td class="py-2 px-4 text-center border-b text-sm">
+                        <tr class="hover:bg-gray-100">
+                            <td class="py-2 px-4 text-center border-b text-gray-700">{{ i + pageStart }}</td>
+                            <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
+                                {{ r.service?.name || 'No especificado' }}
+                            </td>
+
+                            <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
+                                {{ r.endDate   | date: 'longDate'}}
+                            </td>
+                            <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
+                                {{ r.starDate  | date: 'longDate' }}
+                            </td>
+                            <td class="py-2 px-4 text-center border-b text-sm">
                                     <span
                                         class="px-2 py-1 rounded-full text-xs font-medium"
                                         [ngClass]="{
@@ -83,22 +94,28 @@ import {FormsModule} from "@angular/forms";
                                     >
                                         {{ r.status }}
                                     </span>
-                                </td>
-                                <td class="py-2 px-4 text-center border-b text-sm">
-                                    <div class="flex justify-center space-x-3">
-                                        <mat-icon
-                                            class="text-blue-500 hover:text-blue-600 cursor-pointer"
-                                            (click)="goEdit(r.id)"
-                                            >edit</mat-icon
-                                        >
-                                        <mat-icon
-                                            class="text-red-500 hover:text-red-600 cursor-pointer"
-                                            (click)="goDelete(r.id)"
-                                            >delete_sweep</mat-icon
-                                        >
-                                    </div>
-                                </td>
-                            </tr>
+                            </td>
+                            <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
+                                {{ r.user?.name || 'No especificado' }}
+                            </td>
+                            <td class="py-2 px-4 text-center border-b text-gray-700 text-sm">
+                                {{ r.user?.role || 'No especificado' }}
+                            </td>
+                            <td class="py-2 px-4 text-center border-b text-sm">
+                                <div class="flex justify-center space-x-3">
+                                    <mat-icon
+                                        class="text-blue-500 hover:text-blue-600 cursor-pointer"
+                                        (click)="goEdit(r.id)"
+                                    >edit</mat-icon
+                                    >
+                                    <mat-icon
+                                        class="text-red-500 hover:text-red-600 cursor-pointer"
+                                        (click)="goDelete(r.id)"
+                                    >delete_sweep</mat-icon
+                                    >
+                                </div>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                     <!-- Paginación -->

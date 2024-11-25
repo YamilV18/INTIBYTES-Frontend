@@ -9,5 +9,9 @@ export class UserService extends EntityDataService<any> {
         super(httpClient, END_POINTS.setup.user);
     }
 
+    // Metodo para buscar usuarios por nombre
+    searchUsers(name: string): Observable<any[]> {
+        return this.httpClient.get<any[]>(`${END_POINTS.setup.user}?name=${name}`);
+    }
 
 }

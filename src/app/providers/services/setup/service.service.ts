@@ -9,5 +9,14 @@ export class ServiceService extends EntityDataService<any> {
         super(httpClient, END_POINTS.setup.service);
     }
 
+    // Nuevo método para obtener un servicio por ID
+    getServiceById(serviceId: number): Observable<any> {
+        return this.httpClient.get(`${END_POINTS.setup.service}/${serviceId}`);
+    }
+
+    // Método para obtener un servicio por nombre
+    getServiceByName(serviceName: string): Observable<any> {
+        return this.httpClient.get(`${END_POINTS.setup.service}?name=${serviceName}`);
+    }
 
 }
