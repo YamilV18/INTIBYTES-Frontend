@@ -20,9 +20,16 @@ export class OauthService {
         return localStorage.getItem('accessToken') ?? '';
     }
 
+    set userName(userName: string) {
+        sessionStorage.setItem('userName', userName);
+    }
+    get userName(): string {
+        return sessionStorage.getItem('userName') ?? '';
+    }
+
     public authenticate(credentials: any): Observable<IResponse> {
         if (this._authenticated) {
-            return throwError(() => new Error('User is already logged in.'));            
+            return throwError(() => new Error('User is already logged in.'));
         }
         return this.http
             .post<IResponse>(END_POINTS.oauth.login, credentials)
@@ -32,6 +39,7 @@ export class OauthService {
     private setSession(response: any) {
         if (response) {
             this.accessToken = response.token;
+            this.userName = response.userName;
             this._authenticated = true;
             return of(response);
         }

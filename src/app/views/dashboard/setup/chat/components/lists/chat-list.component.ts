@@ -7,6 +7,7 @@ import {CommonModule} from '@angular/common';
 import {ChatService} from "../../../../../../providers/services/setup/chat.service";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
+import {OauthService} from "../../../../../../providers/services";
 
 @Component({
     selector: 'app-chat-list',
@@ -20,7 +21,8 @@ export class ChatListComponent implements OnInit {
     userId: string="";
     messageList: any[] = []
     constructor( private chatservice: ChatService,
-                 private route: ActivatedRoute ) {
+                 private route: ActivatedRoute,
+                 private oauthService: OauthService) {
 
     }
 
@@ -36,6 +38,7 @@ export class ChatListComponent implements OnInit {
             message: this.messageInput,
             user: this.userId
         } as ChatMessage
+        console.log(this.oauthService.userName)
         this.chatservice.sendMessage("ABC", chatMessage);
         this.messageInput="";
     }
@@ -44,7 +47,7 @@ export class ChatListComponent implements OnInit {
         this.chatservice.getMessageSubject().subscribe((messages: any)=> {
             this.messageList = messages.map((item: any)=>({
                 ...item,
-                message_side: item.user === this.userId ? 'sender': 'receiver'
+                message_side: item.user === this.oauthService.userName ? 'sender': 'receiver'
             }))
         });
     }

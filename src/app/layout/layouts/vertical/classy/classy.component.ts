@@ -25,6 +25,7 @@ import { UserComponent } from 'app/layout/common/user/user.component';
 import { Subject, map, takeUntil } from 'rxjs';
 import { MenuService } from '../../../../providers/services/setup/menu.service';
 import { MenuAcceso } from './menu_accesos';
+import {OauthService} from "../../../../providers/services";
 
 @Component({
     selector: 'classy-layout',
@@ -66,7 +67,8 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
         // private _userService: UserService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
         private _fuseNavigationService: FuseNavigationService,
-        private _menuService: MenuService
+        private _menuService: MenuService,
+        private oauthService: OauthService
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -172,7 +174,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
                         title: 'Chat',
                         type: 'basic',
                         icon: 'heroicons_outline:chart-pie',
-                        link: '/homeScreen/setup/chat/1',
+                        link: '/homeScreen/setup/chat/'+this.oauthService.userName,
 
                     },
 
@@ -183,7 +185,7 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
         ];
         this.user = {
             id: 'cfaad35d-07a3-4447-a6c3-d8c3d54fd5df',
-            name: 'Brian Hughes',
+            name: this.oauthService.userName,
             email: 'hughes.brian@company.com',
             avatar: 'assets/images/avatars/brian-hughes.jpg',
             status: 'online',
