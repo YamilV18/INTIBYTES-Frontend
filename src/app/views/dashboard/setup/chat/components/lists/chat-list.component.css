@@ -222,6 +222,13 @@ body {
   line-height: 48px;
 }
 
+.usertext {
+    font-size: 10px;
+    font-weight: 10;
+    display: inline-block;
+    line-height: 5px;
+}
+
 .message_template {
   display: none;
 }

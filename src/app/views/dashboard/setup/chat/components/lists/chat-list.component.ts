@@ -28,7 +28,8 @@ export class ChatListComponent implements OnInit {
 
     ngOnInit() {
         this.userId = this.route.snapshot.params["userId"];
-        this.chatservice.joinRoom("ABC");
+        const roomId = "ABC";
+        this.chatservice.joinRoom(roomId);
         this.listenerMessage()
 
     }
@@ -43,12 +44,12 @@ export class ChatListComponent implements OnInit {
         this.messageInput="";
     }
 
-    listenerMessage(){
-        this.chatservice.getMessageSubject().subscribe((messages: any)=> {
-            this.messageList = messages.map((item: any)=>({
+    listenerMessage() {
+        this.chatservice.getMessageSubject().subscribe((messages: ChatMessage[]) => {
+            this.messageList = messages.map((item: ChatMessage) => ({
                 ...item,
-                message_side: item.user === this.oauthService.userName ? 'sender': 'receiver'
-            }))
+                message_side: item.user === this.oauthService.userName ? 'sender' : 'receiver'
+            }));
         });
     }
 }
