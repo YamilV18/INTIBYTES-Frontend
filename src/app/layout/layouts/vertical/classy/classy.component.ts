@@ -177,6 +177,14 @@ export class ClassyLayoutComponent implements OnInit, OnDestroy {
                         link: '/homeScreen/setup/chat/'+this.oauthService.userName,
 
                     },
+                    {
+                        id: 'Demo',
+                        title: 'Demo',
+                        type: 'basic',
+                        icon: 'heroicons_outline:chart-pie',
+                        link: '/homeScreen/setup/demo/',
+
+                    },
 
                 ],
             },

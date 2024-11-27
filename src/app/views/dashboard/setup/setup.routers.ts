@@ -12,6 +12,7 @@ export default [
             {path: 'subscription', loadChildren: () => import('./subscription/subscription.routers')},
             {path: 'management', loadChildren:()=>import('./management/management.routers')},
             {path: 'review', loadChildren: () => import('./review/review.routers')},
+            {path: 'demo', loadChildren: () => import('./Demo/demo.routers')},
             {path: 'role', loadChildren: () => import('./roles/roles.routers')},
             {path: 'users', loadChildren: () => import('./user/users-routers')},
             {path: 'user', loadChildren: () => import('./user/users-routers')},
