@@ -46,6 +46,14 @@ export class ManagementContainerComponent implements OnInit {
 
     ngOnInit() {
         this.getClients();
+        this._managementService.getAll$().subscribe({
+            next: (response) => {
+                this.managements = response;
+            },
+            error: (err) => {
+                console.error('Error al cargar usuarios:', err);
+            },
+        });
     }
 
     getClients(): void {

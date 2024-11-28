@@ -9,6 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import {Service} from "../../../services/models/service";
 import {FormsModule} from "@angular/forms";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'; // Tipo de archivo Excel
 
 @Component({
     selector: 'app-reviews-list',
@@ -27,6 +33,9 @@ import {FormsModule} from "@angular/forms";
                     <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
                     <span class="ml-2">Nueva Reseña</span>
                 </button>
+
+                <button mat-raised-button color="primary" (click)="generatePDF()">Generar PDF</button>
+                <button mat-raised-button color="primary" (click)="exportToExcel()">Exportar a Excel</button>
 
                 <!-- henyel paso por aqui -->
 
@@ -221,6 +230,80 @@ export class ReviewListComponent implements OnInit, OnChanges {
     // Función para obtener las estrellas vacías
     getEmptyStars(rating: number): number[] {
         return new Array(5 - rating).fill(0); // Crea un arreglo con las estrellas vacías necesarias
+    }
+
+    generatePDF(): void {
+        const doc = new jsPDF(); // Crear el documento PDF
+
+        // Título del documento
+        doc.setFontSize(18);
+        doc.text('Reporte de Rseñas', 10, 10);
+
+        // Agregar fecha de generación
+        doc.setFontSize(12);
+        doc.text('Generado el: ' + new Date().toLocaleDateString(), 10, 20);
+
+        // Preparar los datos para la tabla
+        const subscriptions = this.reviews.map((sub) => {
+            return [
+                sub.id,
+                sub.rating || 'N/A',
+                sub.review || 'N/A',
+                sub.send_date ? new Date(sub.send_date).toLocaleDateString() : 'N/A', // Formatear send_date
+                sub.update_date ? new Date(sub.update_date).toLocaleDateString() : 'N/A', // Formatear update_date
+            ];
+        });
+
+        // Crear la tabla
+        (doc as any).autoTable({
+            head: [['ID', 'Puntuacion', 'Reseña', 'Fecha Inicio', 'Fecha Fin']],
+            body: subscriptions,
+            startY: 30, // Posición inicial de la tabla
+        });
+
+        // Guardar el archivo
+        doc.save('reporte_suscripciones.pdf');
+    }
+
+    exportToExcel(): void {
+        // Preparar los datos para la tabla
+        const data = this.reviews.map((sub) => ({
+            ID: sub.id,
+            Puntuacion: sub.rating || 'N/A',
+            Reseña: sub.review || 'N/A',
+            FechaInicio: sub.send_date ? new Date(sub.send_date).toLocaleDateString() : 'N/A',
+            FechaFin: sub.update_date ? new Date(sub.update_date).toLocaleDateString() : 'N/A',
+
+        }));
+
+        // Crear una hoja de trabajo con estilos
+        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data, { header: [] });
+
+        // Ajustar ancho de columnas
+        worksheet['!cols'] = [
+            { wpx: 50 }, // ID
+            { wpx: 200 }, // Puntuacion
+            { wpx: 150 }, // Reseña
+            { wpx: 120 }, // FechaInicio
+            { wpx: 120 }, // FechaFin
+        ];
+
+        // Crear el libro de Excel
+        const workbook: XLSX.WorkBook = {
+            Sheets: { 'Reseñas': worksheet },
+            SheetNames: ['Reseñas'],
+        };
+
+        // Generar el archivo Excel con el nombre personalizado
+        const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+        // Guardar el archivo
+        this.saveAsExcelFile(excelBuffer, 'Reporte_Reseñas');
+    }
+
+    private saveAsExcelFile(buffer: any, fileName: string): void {
+        const data: Blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+        FileSaver.saveAs(data, `${fileName}_${new Date().toLocaleDateString()}.xlsx`);
     }
 }
 

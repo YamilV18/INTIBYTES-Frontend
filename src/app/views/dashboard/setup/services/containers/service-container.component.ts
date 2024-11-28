@@ -46,6 +46,14 @@ export class ServiceContainerComponent implements OnInit {
 
     ngOnInit() {
         this.getServices();
+        this._serviceService.getAll$().subscribe({
+            next: (response) => {
+                this.services = response;
+            },
+            error: (err) => {
+                console.error('Error al cargar servicios:', err);
+            },
+        });
     }
 
     getServices(): void {

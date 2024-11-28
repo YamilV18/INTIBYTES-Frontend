@@ -9,6 +9,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import {CategoryService} from "../../../../../../providers/services/setup/category.service";
 import {FormsModule} from "@angular/forms";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'; // Tipo de archivo Excel
 
 @Component({
     selector: 'app-service-list',
@@ -25,6 +32,8 @@ import {FormsModule} from "@angular/forms";
                     <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
                     <span class="ml-2">Nuevo Servicio</span>
                 </button>
+                <button mat-raised-button color="primary" (click)="generatePDF()">Generar PDF</button>
+                <button mat-raised-button color="primary" (click)="exportToExcel()">Exportar a Excel</button>
             </div>
             <!-- Filtros -->
             <div class="bg-gray-100 rounded p-2 mb-2">
@@ -255,5 +264,79 @@ export class ServiceListComponent implements OnInit, OnChanges {
 
     public goAssign(id: number): void {
         this.eventAssign.emit(id);
+    }
+
+    generatePDF(): void {
+        const doc = new jsPDF(); // Crear el documento PDF
+
+        // Título del documento
+        doc.setFontSize(18);
+        doc.text('Reporte de Servicios', 10, 10);
+
+        // Agregar fecha de generación
+        doc.setFontSize(12);
+        doc.text('Generado el: ' + new Date().toLocaleDateString(), 10, 20);
+
+        // Preparar los datos para la tabla
+        const subscriptions = this.service.map((sub) => {
+            return [
+                sub.id,
+                sub.name || 'N/A',
+                sub.description|| 'N/A',
+                sub.price|| 'N/A',
+                sub.category?.name || 'N/A',
+            ];
+        });
+
+        // Crear la tabla
+        (doc as any).autoTable({
+            head: [['ID', 'Nombre', 'Descripcion', 'Precio', 'Categoria']],
+            body: subscriptions,
+            startY: 30, // Posición inicial de la tabla
+        });
+
+        // Guardar el archivo
+        doc.save('reporte_categoria.pdf');
+    }
+
+    exportToExcel(): void {
+        // Preparar los datos para la tabla
+        const data = this.service.map((sub) => ({
+            ID: sub.id,
+            Nombre: sub.name || 'N/A',
+            Descripcion: sub.description || 'N/A',
+            Precio: sub.price || 'N/A',
+            Categoria: sub.category?.name || 'N/A',
+
+        }));
+
+        // Crear una hoja de trabajo con estilos
+        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data, { header: [] });
+
+        // Ajustar ancho de columnas
+        worksheet['!cols'] = [
+            { wpx: 50 }, // ID
+            { wpx: 200 }, // Nombre
+            { wpx: 150 }, // Descripcion
+            { wpx: 120 }, // Precio
+            { wpx: 120 }, // Categoria
+        ];
+
+        // Crear el libro de Excel
+        const workbook: XLSX.WorkBook = {
+            Sheets: { 'Servicios': worksheet },
+            SheetNames: ['Servicios'],
+        };
+
+        // Generar el archivo Excel con el nombre personalizado
+        const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+        // Guardar el archivo
+        this.saveAsExcelFile(excelBuffer, 'Reporte_Servicios');
+    }
+
+    private saveAsExcelFile(buffer: any, fileName: string): void {
+        const data: Blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+        FileSaver.saveAs(data, `${fileName}_${new Date().toLocaleDateString()}.xlsx`);
     }
 }

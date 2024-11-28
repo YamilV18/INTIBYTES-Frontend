@@ -10,6 +10,7 @@ import { ConfirmDialogService } from '../../../../../shared/confirm-dialog/confi
 import { SubscriptionService } from '../../../../../providers/services/setup/subscription.service';
 import { SubscriptionListComponent } from '../components/lists/subscription-list.component';
 
+
 @Component({
     selector: 'app-clients-container',
     standalone: true,
@@ -45,6 +46,14 @@ export class SubscriptionContainerComponent implements OnInit {
 
     ngOnInit() {
         this.getClients();
+        this._subscriptionService.getAll$().subscribe({
+            next: (response) => {
+                this.subscriptions = response;
+            },
+            error: (err) => {
+                console.error('Error al cargar suscripciones:', err);
+            },
+        });
     }
 
     getClients(): void {

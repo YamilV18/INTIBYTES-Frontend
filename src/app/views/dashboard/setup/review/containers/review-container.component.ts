@@ -49,6 +49,14 @@ export class ReviewContainerComponent implements OnInit {
 
     ngOnInit() {
         this.getReviews();
+        this._reviewServices.getAll$().subscribe({
+            next: (response) => {
+                this.reviews = response;
+            },
+            error: (err) => {
+                console.error('Error al cargar reseñas:', err);
+            },
+        });
     }
 
     getReviews(): void {

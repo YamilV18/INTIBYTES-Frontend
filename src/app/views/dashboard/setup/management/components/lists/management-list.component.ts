@@ -9,6 +9,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import {FormsModule} from "@angular/forms";
 import {Service} from "../../../services/models/service";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import {EnumValue} from "@angular/compiler-cli/src/ngtsc/partial_evaluator";
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'; // Tipo de archivo Excel
 
 @Component({
     selector: 'app-management-list',
@@ -25,6 +32,8 @@ import {Service} from "../../../services/models/service";
                     <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
                     <span class="ml-2">Nuevo Usuario</span>
                 </button>
+                <button mat-raised-button color="primary" (click)="generatePDF()">Generar PDF</button>
+                <button mat-raised-button color="primary" (click)="exportToExcel()">Exportar a Excel</button>
             </div>
             <!-- Filtros -->
             <div class="flex gap-4 mb-4">
@@ -231,5 +240,88 @@ export class ManagementListComponent implements OnInit, OnChanges {
 
     public goAssign(id: number): void {
         this.eventAssign.emit(id);
+    }
+
+    generatePDF(): void {
+        const doc = new jsPDF(); // Crear el documento PDF
+
+        // Título del documento
+        doc.setFontSize(18);
+        doc.text('Reporte de Usuarios', 10, 10);
+
+        // Agregar fecha de generación
+        doc.setFontSize(12);
+        doc.text('Generado el: ' + new Date().toLocaleDateString(), 10, 20);
+
+        // Preparar los datos para la tabla
+        const managements = this.managements.map((sub) => {
+            return [
+                sub.id,
+                sub.name || 'N/A',
+                sub.email || 'N/A',
+                sub.password || 'N/A',
+                sub.role || 'N/A',
+                sub.starDate ? new Date(sub.starDate).toLocaleDateString() : 'N/A', // Formatear starDate
+                sub.endDate ? new Date(sub.endDate).toLocaleDateString() : 'N/A', // Formatear endDate
+                sub.status || 'N/A',
+            ];
+        });
+
+        // Crear la tabla
+        (doc as any).autoTable({
+            head: [['ID', 'Nombre', 'Correo', 'Contraseña', 'Rol', 'Fecha Inicio', 'Fecha Fin', 'Estado']],
+            body: managements,
+            startY: 30, // Posición inicial de la tabla
+        });
+
+        // Guardar el archivo
+        doc.save('reporte_usuarios.pdf');
+    }
+
+    exportToExcel(): void {
+        // Preparar los datos para la tabla
+        const data = this.managements.map((sub) => ({
+            ID: sub.id,
+            Nombre: sub.name || 'N/A',
+            Correo: sub.email || 'N/A',
+            Contraseña: sub.password || 'N/A',
+            Rol: sub.role || 'N/A',
+            FechaInicio: sub.starDate ? new Date(sub.starDate).toLocaleDateString() : 'N/A',
+            FechaFin: sub.endDate ? new Date(sub.endDate).toLocaleDateString() : 'N/A',
+            Estado: Number(sub.status) === 1 ? 'Activo' : 'Inactivo',
+
+        }));
+
+        // Crear una hoja de trabajo con estilos
+        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data, { header: [] });
+
+        // Ajustar ancho de columnas
+        worksheet['!cols'] = [
+            { wpx: 50 }, // ID
+            { wpx: 200 }, // Nombre
+            { wpx: 150 }, // Correo
+            { wpx: 120 }, // Contraseña
+            { wpx: 120 }, // Rol
+            { wpx: 100 }, // FechaInicio
+            { wpx: 100 }, // FechaFin
+            { wpx: 100 }, // Estado
+        ];
+
+        // Crear el libro de Excel
+        const workbook: XLSX.WorkBook = {
+            Sheets: { 'Usuaios': worksheet },
+            SheetNames: ['Usuaios'],
+        };
+
+        // Generar el archivo Excel con el nombre personalizado
+        const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+        // Guardar el archivo
+        this.saveAsExcelFile(excelBuffer, 'Reporte_Usuarios');
+    }
+
+    private saveAsExcelFile(buffer: any, fileName: string): void {
+        const data: Blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+        FileSaver.saveAs(data, `${fileName}_${new Date().toLocaleDateString()}.xlsx`);
     }
 }

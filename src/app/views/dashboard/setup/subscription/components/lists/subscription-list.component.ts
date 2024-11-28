@@ -8,6 +8,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import {FormsModule} from "@angular/forms";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+
+const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'; // Tipo de archivo Excel
 
 @Component({
     selector: 'app-subscriptions-list',
@@ -24,6 +30,9 @@ import {FormsModule} from "@angular/forms";
                     <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
                     <span class="ml-2">Nuevo Historial</span>
                 </button>
+                <button mat-raised-button color="primary" (click)="generatePDF()">Generar PDF</button>
+                <button mat-raised-button color="primary" (click)="exportToExcel()">Exportar a Excel</button>
+
             </div>
             <!-- Filtro de Estado -->
             <div class="bg-gray-100 rounded p-2 mb-4">
@@ -221,4 +230,85 @@ export class SubscriptionListComponent implements OnInit, OnChanges {
     public goDelete(id: number): void {
         this.eventDelete.emit(id);
     }
+
+    generatePDF(): void {
+        const doc = new jsPDF(); // Crear el documento PDF
+
+        // Título del documento
+        doc.setFontSize(18);
+        doc.text('Reporte de Suscripciones', 10, 10);
+
+        // Agregar fecha de generación
+        doc.setFontSize(12);
+        doc.text('Generado el: ' + new Date().toLocaleDateString(), 10, 20);
+
+        // Preparar los datos para la tabla
+        const subscriptions = this.subscriptions.map((sub) => {
+            return [
+                sub.id,
+                sub.service?.name || 'N/A',
+                sub.user?.name || 'N/A',
+                sub.starDate ? new Date(sub.starDate).toLocaleDateString() : 'N/A', // Formatear starDate
+                sub.endDate ? new Date(sub.endDate).toLocaleDateString() : 'N/A', // Formatear endDate
+                sub.service?.price || 'N/A',
+            ];
+        });
+
+        // Crear la tabla
+        (doc as any).autoTable({
+            head: [['ID', 'Servicio', 'Usuario', 'Fecha Inicio', 'Fecha Fin', 'Precio']],
+            body: subscriptions,
+            startY: 30, // Posición inicial de la tabla
+        });
+
+        // Guardar el archivo
+        doc.save('reporte_suscripciones.pdf');
+    }
+
+    exportToExcel(): void {
+        // Preparar los datos para la tabla
+        const data = this.subscriptions.map((sub) => ({
+            ID: sub.id,
+            Servicio: sub.service?.name || 'N/A',
+            Usuario: sub.user?.name || 'N/A',
+            FechaInicio: sub.starDate ? new Date(sub.starDate).toLocaleDateString() : 'N/A',
+            FechaFin: sub.endDate ? new Date(sub.endDate).toLocaleDateString() : 'N/A',
+            Precio: sub.service?.price || 'N/A',
+            Estado: Number(sub.status) === 1 ? 'Activo' : 'Inactivo',
+
+        }));
+
+        // Crear una hoja de trabajo con estilos
+        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data, { header: [] });
+
+        // Ajustar ancho de columnas
+        worksheet['!cols'] = [
+            { wpx: 50 }, // ID
+            { wpx: 200 }, // Servicio
+            { wpx: 150 }, // Usuario
+            { wpx: 120 }, // FechaInicio
+            { wpx: 120 }, // FechaFin
+            { wpx: 100 }, // Precio
+            { wpx: 100 }, // Estado
+        ];
+
+        // Crear el libro de Excel
+        const workbook: XLSX.WorkBook = {
+            Sheets: { 'Suscripciones': worksheet },
+            SheetNames: ['Suscripciones'],
+        };
+
+        // Generar el archivo Excel con el nombre personalizado
+        const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+        // Guardar el archivo
+        this.saveAsExcelFile(excelBuffer, 'Reporte_Suscripciones');
+    }
+
+    private saveAsExcelFile(buffer: any, fileName: string): void {
+        const data: Blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+        FileSaver.saveAs(data, `${fileName}_${new Date().toLocaleDateString()}.xlsx`);
+    }
+
+
 }
