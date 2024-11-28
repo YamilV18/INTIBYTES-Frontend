@@ -19,6 +19,7 @@ export const END_POINTS = {
       subscription: 'subscription',
       user: 'user',
       review: 'review',
+      demo: 'demo',
     accesRole: 'acceso-rol',
     person: 'persona',
     institution: 'institucion',
